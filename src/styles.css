@@ -1,12 +1,29 @@
 .tabs-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .pinned-tabs,
 .scrollable-tabs {
   display: flex;
   overflow-x: auto;
+}
+
+.pin-button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.close-button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: red;
+  background: transparent;
+  border: none;
 }
 
 .tab {
@@ -31,4 +48,26 @@
 
 .tab-dropdown select {
   padding: 5px;
+}
+
+.tab-controls {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.tab-controls input {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.tab-controls button {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab-icon {
+  margin-right: 8px;
+  font-size: 18px; 
 }
