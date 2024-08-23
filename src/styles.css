@@ -1,0 +1,34 @@
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.pinned-tabs,
+.scrollable-tabs {
+  display: flex;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 10px;
+  margin: 0 5px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pinned {
+  background-color: #ffd700;
+}
+
+.tab-dropdown {
+  margin-top: 10px;
+}
+
+.tabs-list {
+  display: flex;
+}
+
+.tab-dropdown select {
+  padding: 5px;
+}
