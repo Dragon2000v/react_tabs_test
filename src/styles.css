@@ -1,73 +1,171 @@
+/* Основний контейнер табів */
+
 .tabs-container {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
-.pinned-tabs,
-.scrollable-tabs {
-  display: flex;
-  overflow-x: auto;
-}
 
-.pin-button {
-  margin-left: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.close-button {
-  margin-left: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  color: red;
-  background: transparent;
-  border: none;
-}
-
-.tab {
-  padding: 10px;
-  margin: 0 5px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.pinned {
-  background-color: #ffd700;
-}
-
-.tab-dropdown {
-  margin-top: 10px;
-}
+/* Контейнер для табів */
 
 .tabs-list {
-  display: flex;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+
+/* Тіні по краях контейнера */
+
+.tabs-container::before,
+.tabs-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tabs-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+}
+
+.tabs-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.2), transparent);
+}
+
+
+/* Стилі для табів */
+
+.tab {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 0 5px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+/* Стилі для іконки таба */
+
+.tab-icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+
+/* Стилі для назви таба */
+
+.tab-title {
+    flex-grow: 1;
+}
+
+
+/* Стилі для закріплених табів */
+
+.pinned {
+    background-color: #ffd700;
+}
+
+
+/* Стилі для кнопки закріплення */
+
+.pin-button {
+    margin-left: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #007bff;
+}
+
+
+/* Стилі для кнопки закриття */
+
+.close-button {
+    margin-left: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    color: red;
+    background: transparent;
+    border: none;
+}
+
+
+/* Стилі для випадаючого списку */
+
+.tab-dropdown {
+    margin-top: 10px;
 }
 
 .tab-dropdown select {
-  padding: 5px;
+    padding: 5px;
 }
 
+
+/* Стилі для контролів табів */
+
 .tab-controls {
-  margin-top: 16px;
-  display: flex;
-  gap: 8px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
 }
 
 .tab-controls input {
-  padding: 8px;
-  font-size: 14px;
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .tab-controls button {
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tab-controls {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-controls input {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.tab-controls button {
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tab-controls select {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .tab-icon {
-  margin-right: 8px;
-  font-size: 18px; 
+    margin-right: 8px;
+    font-size: 18px;
 }

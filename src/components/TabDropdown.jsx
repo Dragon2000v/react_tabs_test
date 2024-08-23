@@ -1,14 +1,22 @@
 import React from "react";
+import TabDropdownItem from "./TabDropdownItem";
 
-const TabDropdown = ({ overflowTabs }) => {
+const TabDropdown = ({ overflowTabs, onTabDrop, onPinToggle, onClose }) => {
   return (
     <div className="tab-dropdown">
       {overflowTabs.length > 0 && (
-        <select>
-          {overflowTabs.map((tab) => (
-            <option key={tab.id}>{tab.title}</option>
+        <ul>
+          {overflowTabs.map((tab, index) => (
+            <TabDropdownItem
+              key={tab.id}
+              tab={tab}
+              index={index}
+              onTabDrop={onTabDrop}
+              onPinToggle={onPinToggle}
+              onClose={onClose}
+            />
           ))}
-        </select>
+        </ul>
       )}
     </div>
   );
