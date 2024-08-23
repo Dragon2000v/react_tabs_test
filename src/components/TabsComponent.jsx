@@ -13,30 +13,12 @@ export const ItemTypes = {
 
 const TabsComponent = () => {
   const [pinnedTabs, setPinnedTabs] = usePersistentState("pinnedTabs", []);
-  const [unpinnedTabs, setUnpinnedTabs] = usePersistentState("unpinnedTabs", initialUnpinnedTabs);
-  const [newTabTitle, setNewTabTitle] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState("");
+  const [unpinnedTabs, setUnpinnedTabs] = usePersistentState(
+    "unpinnedTabs",
+    initialUnpinnedTabs
+  );
   const [overflowTabs, setOverflowTabs] = useState([]);
   const id = useId(); // Generate a unique ID
-
-  const handleAddTab = () => {
-    if (newTabTitle.trim() && selectedIcon) {
-      const Icon = iconComponents[selectedIcon];
-      if (Icon) {
-        const newTab = {
-          id: `${id}-${Date.now()}`, // Combine ID with timestamp
-          title: newTabTitle,
-          icon: selectedIcon,
-          isPinned: false,
-        };
-        setUnpinnedTabs((prevTabs) => [...prevTabs, newTab]);
-        setNewTabTitle("");
-        setSelectedIcon("");
-      } else {
-        alert("Icon not found. Please check the icon name.");
-      }
-    }
-  };
 
   const handleCloseTab = (id) => {
     setPinnedTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
@@ -110,6 +92,11 @@ const TabsComponent = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [pinnedTabs, unpinnedTabs]);
 
+  // Filter out overflowTabs from unpinnedTabs for rendering
+  const visibleUnpinnedTabs = unpinnedTabs.filter(
+    (tab) => !overflowTabs.some((overflowTab) => overflowTab.id === tab.id)
+  );
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="tabs-container">
@@ -120,18 +107,22 @@ const TabsComponent = () => {
               tab={tab}
               index={index}
               isPinned={true}
-              moveTab={(fromIndex, toIndex) => moveTab(fromIndex, toIndex, true)}
+              moveTab={(fromIndex, toIndex) =>
+                moveTab(fromIndex, toIndex, true)
+              }
               onPinToggle={() => togglePin(tab.id)}
               onClose={() => handleCloseTab(tab.id)}
             />
           ))}
-          {unpinnedTabs.map((tab, index) => (
+          {visibleUnpinnedTabs.map((tab, index) => (
             <Tab
               key={tab.id}
               tab={tab}
               index={index}
               isPinned={false}
-              moveTab={(fromIndex, toIndex) => moveTab(fromIndex, toIndex, false)}
+              moveTab={(fromIndex, toIndex) =>
+                moveTab(fromIndex, toIndex, false)
+              }
               onPinToggle={() => togglePin(tab.id)}
               onClose={() => handleCloseTab(tab.id)}
             />
@@ -140,30 +131,11 @@ const TabsComponent = () => {
         {overflowTabs.length > 0 && (
           <TabDropdown
             overflowTabs={overflowTabs}
+            unpinnedTabs={unpinnedTabs}
             onPinToggle={(id) => togglePin(id)}
             onClose={(id) => handleCloseTab(id)}
           />
         )}
-      </div>
-      <div className="tab-controls">
-        <input
-          type="text"
-          value={newTabTitle}
-          onChange={(e) => setNewTabTitle(e.target.value)}
-          placeholder="Enter tab title"
-        />
-        <select
-          value={selectedIcon}
-          onChange={(e) => setSelectedIcon(e.target.value)}
-        >
-          <option value="">Select an icon</option>
-          {Object.keys(iconComponents).map((iconName) => (
-            <option key={iconName} value={iconName}>
-              {iconName}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleAddTab}>Add Tab</button>
       </div>
     </DndProvider>
   );
@@ -179,6 +151,14 @@ export const iconComponents = {
 const initialUnpinnedTabs = [
   { id: "initial-1", title: "Tab 1", icon: "FaApple", isPinned: false },
   { id: "initial-2", title: "Tab 2", icon: "FaBeer", isPinned: false },
+  { id: "initial-3", title: "Tab 3", icon: "FaApple", isPinned: false },
+  { id: "initial-4", title: "Tab 4", icon: "FaBeer", isPinned: false },
+  { id: "initial-5", title: "Tab 5", icon: "FaApple", isPinned: false },
+  { id: "initial-6", title: "Tab 6", icon: "FaBeer", isPinned: false },
+  { id: "initial-7", title: "Tab 7", icon: "FaApple", isPinned: false },
+  { id: "initial-8", title: "Tab 8", icon: "FaBeer", isPinned: false },
+  { id: "initial-9", title: "Tab 9", icon: "FaApple", isPinned: false },
+  { id: "initial-10", title: "Tab 10", icon: "FaBeer", isPinned: false },
 ];
 
 export default TabsComponent;
