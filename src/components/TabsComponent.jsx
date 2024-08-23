@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Tab from "./Tab";
@@ -12,7 +12,8 @@ export const ItemTypes = {
 };
 
 const TabsComponent = () => {
-  const [tabs, setTabs] = usePersistentState("tabs", initialTabs);
+  const [pinnedTabs, setPinnedTabs] = usePersistentState("pinnedTabs", []);
+  const [unpinnedTabs, setUnpinnedTabs] = usePersistentState("unpinnedTabs", initialUnpinnedTabs);
   const [newTabTitle, setNewTabTitle] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("");
   const [overflowTabs, setOverflowTabs] = useState([]);
@@ -28,7 +29,7 @@ const TabsComponent = () => {
           icon: selectedIcon,
           isPinned: false,
         };
-        setTabs((prevTabs) => [...prevTabs, newTab]);
+        setUnpinnedTabs((prevTabs) => [...prevTabs, newTab]);
         setNewTabTitle("");
         setSelectedIcon("");
       } else {
@@ -37,11 +38,15 @@ const TabsComponent = () => {
     }
   };
 
-  const handleCloseTab = (index) => {
-    setTabs((prevTabs) => prevTabs.filter((_, i) => i !== index));
+  const handleCloseTab = (id) => {
+    setPinnedTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
+    setUnpinnedTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
   };
 
-  const moveTab = (fromIndex, toIndex) => {
+  const moveTab = (fromIndex, toIndex, isPinned) => {
+    const targetTabs = isPinned ? pinnedTabs : unpinnedTabs;
+    const setTabs = isPinned ? setPinnedTabs : setUnpinnedTabs;
+
     setTabs((prevTabs) => {
       const updatedTabs = [...prevTabs];
       const [movedTab] = updatedTabs.splice(fromIndex, 1);
@@ -50,12 +55,23 @@ const TabsComponent = () => {
     });
   };
 
-  const togglePin = (index) => {
-    setTabs((prevTabs) =>
-      prevTabs.map((tab, i) =>
-        i === index ? { ...tab, isPinned: !tab.isPinned } : tab
-      )
-    );
+  const togglePin = (id) => {
+    const tabIndex = unpinnedTabs.findIndex((tab) => tab.id === id);
+
+    if (tabIndex !== -1) {
+      // Перемістити з незакріплених до закріплених
+      const [tab] = unpinnedTabs.splice(tabIndex, 1);
+      tab.isPinned = true;
+      setPinnedTabs((prevTabs) => [...prevTabs, tab]);
+      setUnpinnedTabs([...unpinnedTabs]); // Оновити стан для незакріплених вкладок
+    } else {
+      // Перемістити з закріплених до незакріплених
+      const pinnedIndex = pinnedTabs.findIndex((tab) => tab.id === id);
+      const [tab] = pinnedTabs.splice(pinnedIndex, 1);
+      tab.isPinned = false;
+      setUnpinnedTabs((prevTabs) => [...prevTabs, tab]);
+      setPinnedTabs([...pinnedTabs]); // Оновити стан для закріплених вкладок
+    }
   };
 
   const handleResize = () => {
@@ -78,6 +94,7 @@ const TabsComponent = () => {
           overflowTabs = tabElements.slice(i).map((el) => ({
             id: el.dataset.id,
             title: el.querySelector(".tab-title").innerText,
+            isPinned: false, // Незакріплені вкладки
           }));
           break;
         }
@@ -91,22 +108,7 @@ const TabsComponent = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [tabs]);
-
-  const pinnedTabs = useMemo(() => tabs.filter((tab) => tab.isPinned), [tabs]);
-  const scrollableTabs = useMemo(
-    () => tabs.filter((tab) => !tab.isPinned),
-    [tabs]
-  );
-
-  const handleTabDrop = (index) => {
-    const tabToMove = overflowTabs[index];
-    setTabs((prevTabs) => [
-      ...prevTabs.filter((tab) => tab.id !== tabToMove.id),
-      tabToMove,
-    ]);
-    setOverflowTabs((prev) => prev.filter((_, i) => i !== index));
-  };
+  }, [pinnedTabs, unpinnedTabs]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -117,33 +119,31 @@ const TabsComponent = () => {
               key={tab.id}
               tab={tab}
               index={index}
-              isPinned={tab.isPinned}
-              moveTab={moveTab}
-              onPinToggle={togglePin}
-              onClose={handleCloseTab}
+              isPinned={true}
+              moveTab={(fromIndex, toIndex) => moveTab(fromIndex, toIndex, true)}
+              onPinToggle={() => togglePin(tab.id)}
+              onClose={() => handleCloseTab(tab.id)}
             />
           ))}
-          {scrollableTabs.map((tab, index) => (
+          {unpinnedTabs.map((tab, index) => (
             <Tab
               key={tab.id}
               tab={tab}
-              index={index + pinnedTabs.length}
-              isPinned={tab.isPinned}
-              moveTab={moveTab}
-              onPinToggle={togglePin}
-              onClose={handleCloseTab}
+              index={index}
+              isPinned={false}
+              moveTab={(fromIndex, toIndex) => moveTab(fromIndex, toIndex, false)}
+              onPinToggle={() => togglePin(tab.id)}
+              onClose={() => handleCloseTab(tab.id)}
             />
           ))}
         </div>
         {overflowTabs.length > 0 && (
           <TabDropdown
             overflowTabs={overflowTabs}
-            onTabDrop={handleTabDrop}
-            onPinToggle={togglePin}
-            onClose={handleCloseTab}
+            onPinToggle={(id) => togglePin(id)}
+            onClose={(id) => handleCloseTab(id)}
           />
         )}
-        
       </div>
       <div className="tab-controls">
         <input
@@ -176,9 +176,9 @@ export const iconComponents = {
   FaStar,
 };
 
-const initialTabs = [
+const initialUnpinnedTabs = [
   { id: "initial-1", title: "Tab 1", icon: "FaApple", isPinned: false },
-  { id: "initial-2", title: "Tab 2", icon: "FaBeer", isPinned: true },
+  { id: "initial-2", title: "Tab 2", icon: "FaBeer", isPinned: false },
 ];
 
 export default TabsComponent;
